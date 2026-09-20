@@ -1,0 +1,10 @@
+requests
+numpy
+scipy
+shapely>=2.0
+pyproj
+matplotlib
+tifffile
+imagecodecs
+pillow
+reportlab
