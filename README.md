@@ -84,3 +84,45 @@ depth figures — and no surface data. No contours, no slope. That is the
 centre of this format's green page, so conversion alone cannot fill it.
 Filling it needs a second source: lidar (see `pipeline/greens.py`), a drone
 survey, or bought green maps.
+
+## Converting a vector source book
+
+`convert/pdfx3.py` -> `convert/book.py` -> `convert/draw.py` converts a Shot
+Pattern yardage-book PDF (39 pages, 3.75 x 6.5 in, fully vector) into this
+format. `out/cowboys_pro_book.pdf` is Cowboys Golf Club, all 18 holes, 42
+pages: cover, legend, then a green page and one or two hole pages per hole.
+
+### How the layers are read
+
+Quartz emits a filled-and-stroked shape as two separate operations, so shapes
+are identified by fill/stroke colour pairs and then re-paired:
+
+| Feature | Fill | Stroke |
+|---|---|---|
+| putting green | 0.94, 0.975, 0.93 | 0.56, 0.74, 0.50 |
+| short grass | 0.89, 0.94, 0.87 | 0.70, 0.82, 0.66 |
+| water | 0.80, 0.89, 0.97 | 0.42, 0.63, 0.85 |
+| sand | 0.94, 0.88, 0.72 | 0.74, 0.63, 0.42 |
+| trees | 0.50, 0.70, 0.42 | - |
+| tee box | short-grass fill | ink, w >= 0.7 |
+
+Text is stamped nine times on a 0.7 pt cross to fake bold, and minus signs are
+U+2212; both need normalising before anything parses.
+
+### Calibration
+
+Scale and aim point come from a circle fit on the source range arcs. On hole 9
+the three arcs share one centre to 0.5 pt with radii at exactly 1 : 1.5 : 2.0
+against their 100/150/200 labels. Par 3s carry no arcs, so those calibrate from
+the tee box centroid to the green centroid against the printed "yd to green".
+
+### Accuracy
+
+Every carry number printed in the source book was re-derived from the extracted
+geometry. Across 38 numbers the median difference is **0.4 yd**, the 90th
+percentile **1.2 yd**, and the largest **2.0 yd**.
+
+### Still missing
+
+The source book has no green contour or slope data, so the centre of each green
+page stays open. Everything else in this format converts.
