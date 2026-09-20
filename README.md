@@ -57,3 +57,30 @@ disk, so repeat runs do not re-download.
   tees.
 - **Green contours** come from airborne lidar (~3-5 cm effective vertical on a
   smooth surface). Good for structure, not a substitute for a ground survey.
+
+## Converting pages from another generator
+
+`convert/` re-lays pages produced by another yardage-book app into this
+format. Run order:
+
+```
+convert/extract.py   segment the source page; trace green, corridor, hazards
+convert/build2.py    calibrate px->yards, rotate the play line up
+convert/render2.py   draw the pages
+```
+
+Calibration uses two figures printed on the source page: the stated green
+depth sets the green-panel scale, and the stated tee-to-green distance sets
+the hole-panel scale. Traced green extents came back at 15 x 35 yd against
+16 x 35 stated, and 26 x 33 against 26 x 33 stated.
+
+`out/converted_holes.pdf` holds Cowboys 9 (vector source) and Bridlewood 9
+(satellite source), plus a page of conversion notes.
+
+### The gap this exposed
+
+The source green panel carries an outline, a depth, a width and perimeter
+depth figures — and no surface data. No contours, no slope. That is the
+centre of this format's green page, so conversion alone cannot fill it.
+Filling it needs a second source: lidar (see `pipeline/greens.py`), a drone
+survey, or bought green maps.
